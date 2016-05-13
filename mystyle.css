@@ -1,0 +1,16 @@
+h1 {
+    background-color: #b9def0;
+    text-align: center;
+    margin: 10px 0;
+    padding: 30px 0;
+}
+
+#smallInf {
+    color: #999;
+    font-size: 17px;
+}
+
+#score {
+    font-size: 25px;
+    color: red;
+}

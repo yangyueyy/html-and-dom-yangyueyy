@@ -1,32 +1,28 @@
-/**
- * Created by yangyue on 16-5-9.
- */
-var btnSubmit=document.getElementById("btnSubmit");
-btnSubmit.onclick=function(){
-    var scores=document.getElementById("score");
-    var allScore=0;
-    if(checkInformation()){
-        allScore=countScore();
+var btnSubmit = document.getElementById("btnSubmit");
+btnSubmit.onclick = function () {
+    var scores = document.getElementById("score");
+    var allScore = 0;
+    if (checkInformation()) {
+        allScore = countScore();
+        scores.innerHTML = allScore;
+        alert("你的成绩是：\n" + allScore);
     }
-
-    scores.innerHTML=allScore;
-    alert("你的成绩是：\n"+allScore);
 };
 
 function checkInformation() {
-    var className=document.getElementsByName("className")[0].value;
-    var studentNumber=document.getElementsByName("studentNumber")[0].value;
-    var studentName=document.getElementsByName("studentName")[0].value;
-    if(className && studentNumber && studentName){
+    var className = document.getElementsByName("className")[0].value;
+    var studentNumber = document.getElementsByName("studentNumber")[0].value;
+    var studentName = document.getElementsByName("studentName")[0].value;
+    if (className && studentNumber && studentName) {
         return true;
     }
-    else{
+    else {
         alert("请补充个人信息！");
     }
 }
 
-function countScore(){
-    var score=0;
+function countScore() {
+    var score = 0;
 
     score += getFIllInScore();
     score += getSimpleChoiceScore();
@@ -37,61 +33,70 @@ function countScore(){
     return score;
 }
 
-function getFIllInScore(){
-    var fillInScore=0;
-    var fillInOne=document.getElementById("fill_in_1_1");
-    var fillInTwoOne=document.getElementById("fill_in_2_1");
-    var fillInTwoTwo=document.getElementById("fill_in_2_2");
-    var fillInTwoThree=document.getElementById("fill_in_2_3");
-    var fillInTwoAnswers=["继承性","封装性","多态性"];
+function getFIllInScore() {
+    var fillInScore = 0;
+    var fillInOne = document.getElementById("fill_in_1_1");
+    var answers = answer();
 
-    if(fillInOne.value=="统一建模语言"){
-        fillInScore+=5;
+    if (fillInOne.value === answers.fillIn.answerFillInOne) {
+        fillInScore += 5;
     }
-
-    fillInTwoAnswers.forEach(function(fillInTwoAnswer) {
-        if(fillInTwoOne.value==fillInTwoAnswer){
-            fillInScore+=5;
-        }
-    });
-    fillInTwoAnswers=del(fillInTwoAnswers,fillInTwoOne.value);
-
-    fillInTwoAnswers.forEach(function(fillInTwoAnswer) {
-        if(fillInTwoTwo.value==fillInTwoAnswer){
-            fillInScore+=5;
-        }
-    });
-    fillInTwoAnswers=del(fillInTwoAnswers,fillInTwoTwo.value);
-
-    fillInTwoAnswers.forEach(function(fillInTwoAnswer) {
-        if(fillInTwoThree.value==fillInTwoAnswer){
-            fillInScore+=5;
-        }
-    });
+    fillInScore += getFillInTwoScore();
 
     return fillInScore;
 }
 
-function del(Array,value) {
-    var number=Array.indexOf(value);
+function getFillInTwoScore() {
+    var fillInTwoOne = document.getElementById("fill_in_2_1");
+    var fillInTwoTwo = document.getElementById("fill_in_2_2");
+    var fillInTwoThree = document.getElementById("fill_in_2_3");
+    var answers = answer();
+    var fillInTwoAnswers = answers.fillIn.answerFillInTwo;
+    var fillInTwoScore = 0;
 
-    if(number>-1)
-        Array.splice(number,1);
+    fillInTwoScore += getAnswerScore(fillInTwoAnswers, fillInTwoOne.value);
+    fillInTwoAnswers = deleteArray(fillInTwoAnswers, fillInTwoOne.value);
+
+    fillInTwoScore += getAnswerScore(fillInTwoAnswers, fillInTwoTwo.value);
+    fillInTwoAnswers = deleteArray(fillInTwoAnswers, fillInTwoTwo.value);
+
+    fillInTwoScore += getAnswerScore(fillInTwoAnswers, fillInTwoThree.value);
+
+    return fillInTwoScore;
+}
+function getAnswerScore(answerArray, value) {
+    var i = 0;
+    var answerScore = 0;
+
+    for (i = 0; i < answerArray.length; i++) {
+        if (value === answerArray[i]) {
+            answerScore += 5;
+        }
+    }
+
+    return answerScore;
+}
+
+function deleteArray(Array, value) {
+    var number = Array.indexOf(value);
+
+    if (number > -1) {
+        Array.splice(number, 1);
+    }
 
     return Array;
 }
 
-function getSimpleChoiceScore(){
-    var simpleChoiceScore=0;
-    var choiceOne=document.getElementsByName("choice_1");
-    var choiceTwo=document.getElementsByName("choice_2");
-    var answerOne=1;
-    var answerTwo=0;
+function getSimpleChoiceScore() {
+    var simpleChoiceScore = 0;
+    var choiceOne = document.getElementsByName("choice_1");
+    var choiceTwo = document.getElementsByName("choice_2");
+    var answers = answer();
 
-    if(choiceOne[answerOne].checked){
+    if (choiceOne[answers.simpleChoice.answerChoiceOne].checked) {
         simpleChoiceScore += 10;
     }
-    if(choiceTwo[answerTwo].checked){
+    if (choiceTwo[answers.simpleChoice.answerChoiceTwo].checked) {
         simpleChoiceScore += 10;
     }
 
@@ -99,29 +104,31 @@ function getSimpleChoiceScore(){
 }
 
 function getManyChoiceScore() {
-    var manyChoiceScore=0;
-    var manyChoiceOne=document.getElementsByName("manyChoice_1");
-    var manyChoiceTwo=document.getElementsByName("manyChoice_2");
+    var manyChoiceScore = 0;
+    var manyChoiceOne = document.getElementsByName("manyChoice_1");
+    var manyChoiceTwo = document.getElementsByName("manyChoice_2");
+    var answers = answer();
 
-    if(manyChoiceOne[0].checked && manyChoiceOne[1].checked && manyChoiceOne[3].checked){
+    if (manyChoiceOne[answers.manyChoice.answerManyChoiceOne[0]].checked && manyChoiceOne[answers.manyChoice.answerManyChoiceOne[1]].checked && manyChoiceOne[answers.manyChoice.answerManyChoiceOne[2]].checked && !manyChoiceOne[answers.manyChoice.noanswerManyChoiceOne[0]].checked) {
         manyChoiceScore += 10;
     }
-    if(manyChoiceTwo[0].checked && manyChoiceTwo[1].checked && manyChoiceTwo[2].checked){
+    if (manyChoiceTwo[answers.manyChoice.answerManyChoiceTwo[0]].checked && manyChoiceTwo[answers.manyChoice.answerManyChoiceTwo[1]].checked && manyChoiceTwo[answers.manyChoice.answerManyChoiceTwo[2]].checked && !manyChoiceTwo[answers.manyChoice.noanswerManyChoiceTwo[0]].checked) {
         manyChoiceScore += 10;
     }
 
     return manyChoiceScore;
 }
 
-function getJudgeScore(){
-    var judgeScore=0;
-    var judgeOne=document.getElementsByName("judge_1");
-    var judgeTwo=document.getElementsByName("judge_2");
+function getJudgeScore() {
+    var judgeScore = 0;
+    var judgeOne = document.getElementsByName("judge_1");
+    var judgeTwo = document.getElementsByName("judge_2");
+    var answers = answer();
 
-    if(judgeOne[0].checked){
+    if (judgeOne[answers.judge.answerJudgeOne].checked) {
         judgeScore += 10;
     }
-    if(judgeTwo[1].checked){
+    if (judgeTwo[answers.judge.answerJudgeTwo].checked) {
         judgeScore += 10;
     }
 
@@ -129,27 +136,26 @@ function getJudgeScore(){
 }
 
 function getSimpleAnswerScore() {
-    var simpleAnswerScore=0;
-    var textOne=document.getElementsByName("text_1")[0].value;
-    var answerOne=new RegExp("\u7b80\u5316.*\u62bd\u8c61","g");
-    var answerTwo=new RegExp("\u8868\u8fbe\u5f62\u5f0f","g");
-    var answerThere=new RegExp("\u7269\u7406\u5b9e\u4f53","g");
-    var answerFour=new RegExp("\u67d0\u79cd\u56fe\u5f62","g");
+    var simpleAnswerScore = 0;
+    var textOne = document.getElementsByName("text_1")[0].value;
+    var answers = answer();
+    var answerOne = new RegExp(answers.shortAnswer.answerShortAnswerOneone, "g");
+    var answerTwo = new RegExp(answers.shortAnswer.answerShortAnswerOnetwo, "g");
+    var answerThere = new RegExp(answers.shortAnswer.answerShortAnswerTwoone, "g");
+    var answerFour = new RegExp(answers.shortAnswer.answerShortAnswerTwotwo, "g");
 
-    if(answerOne.test(textOne)){
+    if (answerOne.test(textOne)) {
         simpleAnswerScore += 5;
     }
-    if(answerTwo.test(textOne)){
+    if (answerTwo.test(textOne)) {
         simpleAnswerScore += 5;
     }
-    if(answerThere.test(textOne)){
+    if (answerThere.test(textOne)) {
         simpleAnswerScore += 5;
     }
-    if(answerFour.test(textOne)){
+    if (answerFour.test(textOne)) {
         simpleAnswerScore += 5;
     }
-
-//模型　简化啦啦啦抽象轻轻巧巧表达形式，某种图形，目力所及、物理实体。
 
     return simpleAnswerScore;
 }
